@@ -1,6 +1,6 @@
 import { response } from 'express'
 import {pool} from '../database'
-
+const helpers = require('../libs/helpers');
 export const readAllUsers = async(req , res ) => {
     try {
         const response = await pool.query('select * from usuario');
@@ -40,11 +40,12 @@ export const delUser = async (req , res) => {
 
 export const updateUser = async(req, res)=>{
     try {
-        const id = parseInt(req.params.id);
+   
         const{ idempleado ,username, password  , idrol } = req.body;
-        await pool.query('update usuario set username=$1 , password=$2, idrol=$3 , iddocente=$4  where idusuario=$5', [idempleado ,username, password , idrol , iddocente, id]);
+        const password2 = await helpers.encryptPassword(password);
+        await pool.query('update usuario set username=$1 , password=$2, idrol=$3 , iddocente=$4  where idusuario=$5', [idempleado ,username, password2 , idrol , iddocente, id]);
         return res.status(200).json(
-            `El Usuario  ${ id } ha sido modificado correctamente...!`);
+            `El Usuario  ${ username } ha sido modificado correctamente...!`);
     } catch (e) {
         console.log(e);
         return res.status(500).json('Internal Server error...!');
